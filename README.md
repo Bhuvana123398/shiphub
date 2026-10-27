@@ -1,0 +1,3 @@
+## Reflection
+
+A filter request returns `200 OK` even when no orders match because the request is valid, but the result is an empty list. The response contains `count: 0` and `data: []`, allowing the client application to display a message such as "No orders found." A single-order lookup returns `404 Not Found` when the requested order ID does not exist because the specific order cannot be found. The client application can display an empty list for a filter with no matches, while showing an error message when a requested order is missing.
