@@ -4,7 +4,11 @@ import { orders } from "./data/orders.js";
 
 const server = createServer((req, res) => {
   res.setHeader("Content-Type", "application/json");
-  if (req.url === "/health" && req.method === "GET") {
+
+  const url = new URL(req.url, "http://localhost:3000");
+  const pathname = url.pathname;
+
+  if (req.method === "GET" && pathname === "/health") {
     res.writeHead(200);
     res.end(JSON.stringify({
       success: true,
@@ -12,15 +16,48 @@ const server = createServer((req, res) => {
     }));
     return;
   }
-  if (req.url === "/orders" && req.method === "GET") {
+
+  if (req.method === "GET" && pathname === "/orders") {
+    const status = url.searchParams.get("status");
+
+    const filteredOrders = status
+      ? orders.filter(order => order.status === status)
+      : orders;
+
     res.writeHead(200);
     res.end(JSON.stringify({
       success: true,
-      count: orders.length,
-      data: orders
+      count: filteredOrders.length,
+      data: filteredOrders
     }));
     return;
   }
+  
+  if (req.method === "GET" && pathname.startsWith("/orders/")) {
+    const orderId = decodeURIComponent(
+      pathname.slice("/orders/".length)
+    );
+
+    const order = orders.find(item => item.id === orderId);
+
+    if (!order) {
+      res.writeHead(404);
+      res.end(JSON.stringify({
+        success: false,
+        message: "Order not found",
+        id: orderId
+      }));
+      return;
+    }
+
+    res.writeHead(200);
+    res.end(JSON.stringify({
+      success: true,
+      data: order
+    }));
+    return;
+  }
+
   res.writeHead(404);
   res.end(JSON.stringify({
     success: false,
