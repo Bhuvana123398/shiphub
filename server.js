@@ -19,11 +19,7 @@ const server = createServer((req, res) => {
 
   if (req.method === "GET" && pathname === "/orders") {
     const status = url.searchParams.get("status");
-
-    const filteredOrders = status
-      ? orders.filter(order => order.status === status)
-      : orders;
-
+    const filteredOrders = status? orders.filter(order => order.status === status): orders;
     res.writeHead(200);
     res.end(JSON.stringify({
       success: true,
